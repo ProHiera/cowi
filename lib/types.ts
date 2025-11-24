@@ -8,6 +8,66 @@ export type ProjectStatus =
 
 export type DeploymentTarget = "vercel" | "concept_aws" | "concept_netlify" | "concept_expo";
 
+export type AIProvider = "cowi_free" | "openai" | "anthropic" | "azure_openai" | "google" | "custom";
+
+export type AIUsageMode = "chat" | "prompt_builder" | "code_generation" | "analysis";
+
+export interface UserModelConfig {
+  id: string;
+  user_id: string;
+  label: string;
+  provider: AIProvider;
+  model_name: string;
+  mode: AIUsageMode;
+  secret_reference: string | null;
+  api_key_last_four: string | null;
+  base_url: string | null;
+  metadata: Record<string, string> | null;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  last_used_at: string | null;
+}
+
+export interface ProjectAISettings {
+  id: string;
+  project_id: string;
+  preferred_mode: AIUsageMode;
+  model_config_id: string | null;
+  fallback_provider: AIProvider;
+  temperature: number | null;
+  max_output_tokens: number | null;
+  system_prompt: string | null;
+  safety_level: "strict" | "balanced" | "creative";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ResolvedModelConfig {
+  provider: AIProvider;
+  model_name: string;
+  mode: AIUsageMode;
+  api_key: string | null;
+  base_url?: string | null;
+  metadata?: Record<string, string> | null;
+  temperature?: number | null;
+  max_output_tokens?: number | null;
+  system_prompt?: string | null;
+  safety_level?: "strict" | "balanced" | "creative";
+}
+
+export interface AIMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export interface AIResponse {
+  output: string;
+  provider: AIProvider;
+  model: string;
+  raw?: unknown;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -79,6 +139,8 @@ export type Tables = {
   rooms: Room;
   room_states: RoomState;
   room_participants: RoomParticipant;
+  user_model_configs: UserModelConfig;
+  project_ai_settings: ProjectAISettings;
 };
 
 export type Database = {

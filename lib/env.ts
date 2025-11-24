@@ -1,11 +1,13 @@
 const requiredServerEnv = ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"] as const;
+const optionalServerEnv = ["COWI_FREE_MODEL_API_KEY", "COWI_FREE_MODEL_BASE_URL"] as const;
 
-type RequiredServerEnv = typeof requiredServerEnv[number];
+type RequiredServerEnv = (typeof requiredServerEnv)[number];
+type OptionalServerEnv = (typeof optionalServerEnv)[number];
 
-type EnvShape = Record<RequiredServerEnv, string>;
+type EnvShape = Record<RequiredServerEnv, string> & Partial<Record<OptionalServerEnv, string>>;
 
 export function getEnv(): EnvShape {
-  const entries = requiredServerEnv.map((key) => {
+  const requiredEntries = requiredServerEnv.map((key) => {
     const value = process.env[key];
 
     if (!value) {
@@ -17,5 +19,12 @@ export function getEnv(): EnvShape {
     return [key, value] as const;
   });
 
-  return Object.fromEntries(entries) as EnvShape;
+  const optionalEntries = optionalServerEnv
+    .map((key) => {
+      const value = process.env[key];
+      return value ? ([key, value] as const) : null;
+    })
+    .filter(Boolean) as Array<readonly [OptionalServerEnv, string]>;
+
+  return Object.fromEntries([...requiredEntries, ...optionalEntries]) as EnvShape;
 }
