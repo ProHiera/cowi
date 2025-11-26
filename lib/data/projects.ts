@@ -1,3 +1,4 @@
+import { getActiveUserId } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 import type { ComboType, Project, ProjectConfig, ProjectStatus } from "@/lib/types";
 
@@ -5,9 +6,19 @@ interface CreateProjectParams {
   comboType: ComboType;
   stack: string;
   promptText?: string;
+  title?: string;
+  description?: string;
+  status?: ProjectStatus;
 }
 
-export async function createProjectRecord({ comboType, stack, promptText }: CreateProjectParams) {
+export async function createProjectRecord({
+  comboType,
+  stack,
+  promptText,
+  title,
+  description,
+  status,
+}: CreateProjectParams) {
   const supabase = createSupabaseServerClient();
   const { data, error } = await supabase
     .from("projects")
@@ -15,10 +26,10 @@ export async function createProjectRecord({ comboType, stack, promptText }: Crea
       combo_type: comboType,
       stack,
       prompt_text: promptText ?? null,
-      status: "prompt_ready",
-      owner_id: "demo-user",
-      title: `${comboType} project`,
-      description: "Draft project created from combo wizard",
+      status: status ?? "prompt_ready",
+      owner_id: getActiveUserId(),
+      title: title ?? `${comboType} project`,
+      description: description ?? "Draft project created from combo wizard",
     })
     .select("*")
     .single();
@@ -28,7 +39,7 @@ export async function createProjectRecord({ comboType, stack, promptText }: Crea
     throw error ?? new Error("Unable to create project");
   }
 
-  return data satisfies Project;
+  return data as Project;
 }
 
 export async function getProjectById(id: string) {
@@ -44,11 +55,29 @@ export async function getProjectById(id: string) {
     return null;
   }
 
-  const { project_configs, ...project } = data as Project & { project_configs: ProjectConfig | null };
+  const typed = data as unknown as Project & { project_configs: ProjectConfig | null };
+  const { project_configs, ...project } = typed;
   return { project, config: project_configs };
 }
 
 export async function updateProjectStatus(id: string, status: ProjectStatus) {
   const supabase = createSupabaseServerClient();
   return supabase.from("projects").update({ status }).eq("id", id);
+}
+
+export async function updateProjectPrompt(id: string, promptText: string) {
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("projects")
+    .update({ prompt_text: promptText })
+    .eq("id", id)
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    console.error("[projects] failed to update prompt", error?.message);
+    throw error ?? new Error("Unable to update project prompt");
+  }
+
+  return data as Project;
 }

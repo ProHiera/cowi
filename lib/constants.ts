@@ -1,4 +1,4 @@
-import type { ComboPreset } from "@/lib/types";
+import type { ComboPreset, PromptTemplate } from "@/lib/types";
 
 export const COMBO_PRESETS: ComboPreset[] = [
   {
@@ -113,7 +113,7 @@ export const PROJECT_STATUS_LABELS: Record<string, string> = {
   domain_ready: "Domain Ready",
 };
 
-export const FALLBACK_PROMPTS = [
+export const FALLBACK_PROMPTS: PromptTemplate[] = [
   {
     id: "saas-dashboard",
     title: "SaaS dashboard",

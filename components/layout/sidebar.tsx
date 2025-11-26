@@ -11,10 +11,13 @@ import { Badge } from "@/components/ui/badge";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
+  { href: "/wizard", label: "Onboarding" },
+  { href: "/console", label: "Console" },
   { href: "/studio", label: "Prompt Studio" },
   { href: "/project", label: "Projects" },
   { href: "/room", label: "Rooms" },
   { href: "/prompts", label: "Prompts" },
+  { href: "/agent", label: "Agent" },
 ];
 
 export function Sidebar() {

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import { DeploymentForm } from "@/components/deployment-form";
 import { DomainSearchPanel } from "@/components/domain-search-panel";
+import { ModelConfigManager } from "@/components/model-config-manager";
+import { ProjectAISettingsCard } from "@/components/project-ai-settings-card";
 import { StatusTimeline } from "@/components/status-timeline";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -70,6 +72,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </CardContent>
         </Card>
         <DomainSearchPanel />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <ProjectAISettingsCard projectId={project.id} />
+        <ModelConfigManager />
       </div>
     </div>
   );

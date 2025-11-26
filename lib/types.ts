@@ -109,6 +109,73 @@ export interface PromptTemplate {
   created_at: string;
 }
 
+export interface PromptLibraryEntry {
+  id: string;
+  user_id: string;
+  title: string;
+  summary: string | null;
+  content: string;
+  combo_type: ComboType | "all";
+  tags: string[];
+  metadata: Record<string, unknown> | null;
+  is_shared: boolean;
+  usage_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptUsageLog {
+  id: string;
+  user_id: string;
+  project_id: string | null;
+  prompt_id: string | null;
+  combo_type: ComboType | null;
+  provider: AIProvider | null;
+  tokens_input: number | null;
+  tokens_output: number | null;
+  cost_usd: number | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface PromptRecommendation {
+  id: string;
+  title: string;
+  summary: string | null;
+  combo_type: ComboType | "all";
+  tags: string[];
+  content: string;
+  score: number;
+  reason: string;
+  source: "rule" | "llm" | "fallback";
+}
+
+export type AgentEventType = "terminal" | "problem" | "translation" | "diff";
+export type AgentEventStatus = "received" | "processing" | "ready" | "applied" | "error";
+
+export interface AgentEvent {
+  id: string;
+  user_id: string;
+  event_type: AgentEventType;
+  source: "vscode" | "web";
+  status: AgentEventStatus;
+  payload: Record<string, unknown>;
+  language: string | null;
+  detected_language: string | null;
+  translated_text: string | null;
+  summary: string | null;
+  root_cause: Array<{ title: string; detail: string; confidence: number }> | null;
+  file_path: string | null;
+  original_snippet: string | null;
+  proposed_snippet: string | null;
+  fix_patch: string | null;
+  fix_status: "suggested" | "applied" | "rejected" | null;
+  resolution_notes: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Room {
   id: string;
   project_id: string;
@@ -131,29 +198,28 @@ export interface RoomParticipant {
   joined_at: string;
 }
 
-export type Tables = {
-  users: User;
-  projects: Project;
-  project_configs: ProjectConfig;
-  prompt_templates: PromptTemplate;
-  rooms: Room;
-  room_states: RoomState;
-  room_participants: RoomParticipant;
-  user_model_configs: UserModelConfig;
-  project_ai_settings: ProjectAISettings;
-};
+export type OnboardingStatus = "draft" | "completed" | "failed";
 
-export type Database = {
-  public: {
-    Tables: {
-      [K in keyof Tables]: {
-        Row: Tables[K];
-        Insert: Partial<Tables[K]>;
-        Update: Partial<Tables[K]>;
-      };
-    };
-  };
-};
+export interface OnboardingSession {
+  id: string;
+  user_id: string;
+  purpose: string | null;
+  target_audience: string | null;
+  model_preference: string | null;
+  hosting_target: string | null;
+  api_provider: string | null;
+  api_key_last_four: string | null;
+  recommend_template_id: string | null;
+  status: OnboardingStatus;
+  vercel_hook_url: string | null;
+  deploy_triggered_at: string | null;
+  deploy_response: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type { Database } from "@/supabase/types.gen";
 
 export interface DeploymentRecommendation {
   target: DeploymentTarget;
@@ -173,4 +239,28 @@ export interface ComboPreset {
   tools: string[];
   defaultStack: string;
   recommendations: DeploymentRecommendation[];
+}
+
+export interface DeployLogEntry {
+  sessionId: string;
+  hookUrl: string | null;
+  triggeredAt: string | null;
+  ok: boolean | null;
+  statusCode: number | null;
+  bodyPreview: string | null;
+  errorMessage: string | null;
+}
+
+export interface ConsoleProjectRow {
+  project: Project;
+  config: ProjectConfig | null;
+}
+
+export interface ConsoleSummary {
+  onboardingTotals: Partial<Record<OnboardingStatus, number>>;
+  projectTotals: Partial<Record<ProjectStatus, number>>;
+  recentOnboarding: OnboardingSession[];
+  recentProjects: ConsoleProjectRow[];
+  deployLog: DeployLogEntry[];
+  generatedAt: string;
 }
