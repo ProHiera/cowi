@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mobile": "npm run start --prefix apps/mobile"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -31,6 +32,7 @@
     "react-dom": "19.2.0",
     "react-hook-form": "^7.66.1",
     "sonner": "^2.0.7",
+    "swr": "^2.3.6",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.13",
     "zustand": "^5.0.8"
